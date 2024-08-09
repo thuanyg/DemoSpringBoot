@@ -1,15 +1,13 @@
-FROM maven:3-openjdk-17 AS build
+FROM maven:3.9.8-amazoncorretto-21-al2023 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
 
-COPY . .
 RUN mvn clean package -DskipTests
-RUN ls -al /app/target   # Add this line to check the files in the target directory
 
 # Run stage
-FROM openjdk:17-jdk-slim
+FROM openjdk:24-jdk-slim-bullseye
 WORKDIR /app
-
-COPY --from=build /app/target/DrComputer-0.0.1-SNAPSHOT.war drcomputer.war
+COPY --from=build /app/target/first-sprint-boot-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-
-ENTRYPOINT ["java","-jar","drcomputer.war"]
+ENTRYPOINT ["java","-jar","app.jar"]
